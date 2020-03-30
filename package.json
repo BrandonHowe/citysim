@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/xWafl/citysim/issues"
   },
-  "homepage": "https://github.com/xWafl/citysim#readme"
+  "homepage": "https://github.com/xWafl/citysim#readme",
+  "dependencies": {
+    "faker": "^4.1.0"
+  }
 }

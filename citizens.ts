@@ -1,5 +1,7 @@
 import {Apartment, Office} from "./buildings";
 
+const skills = ["software", "medicine", "accounting", "CR", "architect", "administration"];
+
 class Citizen {
     food: number;
     happiness: number;
@@ -46,4 +48,4 @@ class Citizen {
     }
 }
 
-export { Citizen };
+export { Citizen, skills };

@@ -1,11 +1,6 @@
 import {Apartment, Blueprint, Office, Farm} from "./buildings";
 import {Citizen} from "./citizens";
 
-const skills = ["software", "doctor", "accounting", "customerservice", "insurance", "architect", "administration"];
-
-const dayCycle = () => {
-
-};
 
 const myFarmBlueprint = new Blueprint ({x: 660, y: 60, z: 66}, 6);
 const myCitizen = new Citizen ("Joe", 100, "administration");
@@ -17,7 +12,7 @@ const myCitizen = new Citizen ("Joe", 100, "administration");
 // myCitizen.getHired(myCompany);
 // console.log(myCitizen.occupation);
 
-const myFarm = new Farm("Farmie", myCitizen, myFarmBlueprint, 100);
-myFarm.buyCorn(0);
-myFarm.autoHarvest(80);
-console.log(myFarm);
+// const myFarm = new Farm("Farmie", myCitizen, myFarmBlueprint, 100);
+// myFarm.buyCorn(0);
+// myFarm.autoHarvest(80);
+// console.log(myFarm);
