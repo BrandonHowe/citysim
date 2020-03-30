@@ -1,9 +1,10 @@
-import {Citizen} from "./index";
+import {Citizen} from "./citizens";
 
 class Blueprint {
+    // x/z: horizontal y: vertical
     constructor (public dims: Record<string, number>, public stories: number){}
     get sizePerFloor () {
-        return this.dims.x * this.dims.y;
+        return this.dims.x * this.dims.z;
     }
     get totalSize () {
         return this.sizePerFloor * this.stories;
@@ -15,6 +16,7 @@ class Blueprint {
 
 class Building {
     protected administrationEff: number;
+    public employed: Array<Citizen>;
     protected constructor (public name: string, public owner: Citizen, public dims: Blueprint, protected money: number) {
         this.administrationEff = owner.skill === "administration" ? 1 : 0.75;
     }
@@ -57,11 +59,9 @@ class Apartment extends Building {
 
 class Office extends Building {
     // the pinnacle of capitalism
-    employed: Array<Citizen>;
     maxEmployed: number;
     constructor (public name: string, public owner: Citizen, public dims: Blueprint, public industry: string, public salary: number, protected money: number) {
         super(name, owner, dims, money);
-        this.employed = [];
         this.maxEmployed = this.dims.maxPplTotal;
     }
     get employedCount () {
@@ -72,9 +72,49 @@ class Office extends Building {
     }
 }
 
+class Farm extends Building {
+    plantingDay: number;
+    constructor (public name: string, public owner: Citizen, public dims: Blueprint, protected money: number) {
+        super(name, owner, dims, money);
+        this.employed = [];
+        this.administrationEff *= (this.employed.length + 1) / this.peopleNeeded;
+    }
+    employCitizen (citizen: Citizen) {
+        if (citizen.skill === "farming") {
+            this.employed.push(citizen);
+            this.administrationEff = (this.owner.skill === "administration" ? 1 : 0.75) * (this.employed.length + 1) / this.peopleNeeded;
+        }
+    }
+    get area () {
+        return this.dims.sizePerFloor;
+    }
+    get peopleNeeded () {
+        // 4 people per acre
+        return (4 * this.area / 43560) + 1;
+    }
+    get bushelPerSqFt () {
+        return 3.46 * 135 / 43560;
+    }
+    buyCorn (day: number) {
+        // 1 dollar is about 220 sq feet ($200 per acre)
+        // we are using corn for reference
+        const totalCost = this.area / 220;
+        this.money -= totalCost;
+    }
+    autoHarvest (day: number) {
+        if (day >= this.plantingDay + 80) {
+            this.harvestCorn();
+        }
+    }
+    private harvestCorn() {
+        this.money += this.bushelPerSqFt * this.area * this.administrationEff;
+    }
+}
+
 export {
     Blueprint,
     Building,
     Apartment,
-    Office
+    Office,
+    Farm
 }
