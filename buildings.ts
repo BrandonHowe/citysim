@@ -10,7 +10,7 @@ class Blueprint {
         return this.sizePerFloor * this.stories;
     }
     get maxPplTotal () {
-        return this.totalSize / 15;
+        return Math.floor(this.totalSize / 50);
     }
 }
 
@@ -86,6 +86,7 @@ class Farm extends Building {
         }
     }
     get area () {
+        // How many square feet does this town take up
         return this.dims.sizePerFloor;
     }
     get peopleNeeded () {
@@ -93,12 +94,13 @@ class Farm extends Building {
         return (4 * this.area / 43560) + 1;
     }
     get bushelPerSqFt () {
-        return 3.46 * 135 / 43560;
+        // How many bushels are in 1 square foot
+        return 135 / 43560;
     }
     buyCorn (day: number) {
-        // 1 dollar is about 220 sq feet ($200 per acre)
-        // we are using corn for reference
-        const totalCost = this.area / 220;
+        // To plant 1 acre of corn, it costs around $120
+        this.plantingDay = day;
+        const totalCost = (this.area / 43560) * 120;
         this.money -= totalCost;
     }
     autoHarvest (day: number) {
@@ -107,7 +109,9 @@ class Farm extends Building {
         }
     }
     private harvestCorn() {
-        this.money += this.bushelPerSqFt * this.area * this.administrationEff;
+        // Price of 1 dollar per bushel
+        this.money += 3.46 * this.bushelPerSqFt * this.area * this.administrationEff;
+        this.money = Number(this.money.toFixed(4));
     }
 }
 

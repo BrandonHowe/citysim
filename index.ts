@@ -12,7 +12,7 @@ const myCitizen = new Citizen ("Joe", 100, "administration");
 // myCitizen.getHired(myCompany);
 // console.log(myCitizen.occupation);
 
-// const myFarm = new Farm("Farmie", myCitizen, myFarmBlueprint, 100);
-// myFarm.buyCorn(0);
-// myFarm.autoHarvest(80);
-// console.log(myFarm);
+const myFarm = new Farm("Farmie", myCitizen, myFarmBlueprint, 100);
+myFarm.buyCorn(0);
+myFarm.autoHarvest(80);
+console.log(myFarm);

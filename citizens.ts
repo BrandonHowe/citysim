@@ -1,6 +1,15 @@
-import {Apartment, Office} from "./buildings";
+import {Apartment, Blueprint, Farm, Office} from "./buildings";
 
-const skills = ["software", "medicine", "accounting", "CR", "architect", "administration"];
+const skills: Record<Skill, number> = {
+    "software": 7,
+    "medicine": 1,
+    "accounting": 10,
+    "farming": 4,
+    "architecture": 2,
+    "administration": 3,
+};
+
+type Skill = "software" | "medicine" | "accounting" | "farming" | "architecture" | "administration";
 
 class Citizen {
     food: number;
@@ -9,16 +18,17 @@ class Citizen {
     residence: Apartment;
     minimumSalary: number;
     maximumRent: number;
-    constructor (public name: string, private money: number, public skill: string) {
+
+    constructor(public name: string, private money: number, public skill: Skill) {
         this.food = 100;
         this.happiness = 100;
         this.minimumSalary = 130;
         this.maximumRent = 2.5;
         this.occupation = null;
         this.residence = null;
-        // this._skill = skills[Math.random() * skills.length];
     }
-    getHired (company: Office) {
+
+    getHired(company: Office) {
         if (company.industry == this.skill) {
             // console.log("Industry matched")
             if (company.employedCount < company.maxEmployed) {
@@ -32,20 +42,36 @@ class Citizen {
             }
         }
     }
-    moveIn (location: Apartment) {
+
+    moveIn(location: Apartment) {
         if (this.maximumRent > location.rentPerSqft) {
             location.accept(this);
         }
     }
-    moveOut () {
+
+    moveOut() {
         this.residence.evict(this);
     }
-    payRent () {
+
+    payRent() {
         if (this.money > this.residence.rentPrice) {
             this.money -= this.residence.rentPrice;
             this.residence.payRent(this);
         }
     }
+
+    foundOffice() {
+        console.log("office");
+        // 2500 sq ft, a small office.
+        const officeBlueprint = new Blueprint({x: 40, y: 20, z: 40}, 2);
+        return new Office(`${this.name.split(" ")[1]} Inc`, this, officeBlueprint, "software", Math.floor(Math.random() * 100) + 100, 1000);
+    }
+
+    foundFarm() {
+        // 1 acre large
+        const farmBluePrint = new Blueprint({x: 660, y: 10, z: 66}, 1);
+        return new Farm(`${this.name.split(" ")[1]} Farms`, this, farmBluePrint, 1000);
+    }
 }
 
-export { Citizen, skills };
+export {Citizen, Skill, skills};
