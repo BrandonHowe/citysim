@@ -5,7 +5,7 @@ const skills: Record<Skill, number> = {
     "medicine": 1,
     "accounting": 10,
     "farming": 4,
-    "maintenance": 2,
+    "maintenance": 10,
     "administration": 3,
 };
 
@@ -45,10 +45,14 @@ class Citizen {
         }
     }
 
-    foundOffice() {
+    pay(money: number) {
+        this.money += money;
+    }
+
+    foundOffice(day: number) {
         // 2500 sq ft, a small office.
         const officeBlueprint = new Blueprint({x: 40, y: 20, z: 40}, 2);
-        return new Office(`${this.name.split(" ")[1]} Inc`, this, officeBlueprint, "software", Math.floor(Math.random() * 100) + 150, 1000);
+        return new Office(`${this.name.split(" ")[1]} Inc`, this, officeBlueprint, "software", Math.floor(Math.random() * 100) + 150, 1000, day);
     }
 
     foundFarm() {

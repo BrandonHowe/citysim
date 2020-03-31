@@ -13,6 +13,6 @@ const myCitizen = new Citizen ("Joe", 100, "administration");
 // console.log(myCitizen.occupation);
 
 const myFarm = new Farm("Farm", myCitizen, myFarmBlueprint, 100, 100);
-myFarm.buyCorn(0);
+myFarm.plantCorn(0);
 myFarm.autoHarvest(80);
 console.log(myFarm);

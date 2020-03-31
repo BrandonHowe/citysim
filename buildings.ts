@@ -24,7 +24,7 @@ class Blueprint {
 class Building {
     protected administrationEff: number;
     public employed: Array<Citizen>;
-    protected constructor (public name: string, public owner: Citizen, public dims: Blueprint, protected money: number) {
+    protected constructor (public name: string, public owner: Citizen, public dims: Blueprint, public money: number) {
         this.administrationEff = owner.skill === "administration" ? 1 : 0.75;
     }
 }
@@ -33,7 +33,7 @@ class Apartment extends Building {
     apartmentsPerFloor: number;
     totalApartments: number;
     private renters: Array<Citizen>;
-    constructor (public name: string, public owner: Citizen, public dims: Blueprint, public apartmentSize: number, public rentPerSqft: number, protected money){
+    constructor (public name: string, public owner: Citizen, public dims: Blueprint, public apartmentSize: number, public rentPerSqft: number, public money){
         super(name, owner, dims, money);
         this.renters = [];
         this.apartmentsPerFloor = this.dims.sizePerFloor / this.apartmentSize / 2;
@@ -67,8 +67,9 @@ class Apartment extends Building {
 class Office extends Building {
     // the pinnacle of capitalism
     maxEmployed: number;
-    private currentProduct: SoftwareProduct;
-    constructor (public name: string, public owner: Citizen, public dims: Blueprint, public industry: string, public pay: number, protected money: number) {
+    private bankruptStart: number;
+    currentProduct: SoftwareProduct;
+    constructor (public name: string, public owner: Citizen, public dims: Blueprint, public industry: string, public pay: number, public money: number, public foundingDay: number) {
         super(name, owner, dims, money);
         this.maxEmployed = this.dims.maxPplTotal;
         this.employed = [];
@@ -77,20 +78,49 @@ class Office extends Building {
         this.employed.push(citizen);
         citizen.occupation = this;
     }
+    payCitizens () {
+        for (const employee of this.employed) {
+            employee.pay(this.pay);
+            this.money -= this.pay;
+        }
+    }
+
+    fireEmployee(employee: Citizen) {
+        this.employed.splice(this.employed.indexOf(employee), 1);
+        employee.occupation = undefined;
+    }
+
+    checkBankruptcy(day: number) {
+        if (this.money < 0) {
+            this.bankruptStart = day;
+        }
+        if (day > this.bankruptStart + 365) {
+            for (const employee of this.employed) {
+                this.fireEmployee(employee);
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    changePay() {
+        // this.pay = this.employed.length / this.maxEmployed > 0.2 ? Math.floor(this.pay * 0.99) : Math.ceil(this.pay * 1.01);
+    }
+
     developProduct (day) {
         if (!this.currentProduct) {
             this.currentProduct = {
                 name: `${this.name.split(" ")[1]} Software`,
                 quality: 1 + (this.employed.length / (Math.floor(Math.random()) + 2)),
-                releaseDay: day + ((2 - (this.employed.length / this.maxEmployed)) * 180),
+                releaseDay: day + ((2 - (this.employed.length / this.maxEmployed)) * 90),
                 company: this
             }
         }
     }
     releaseProduct (day) {
-        if (day >= this.currentProduct.releaseDay) {
-            this.currentProduct = undefined;
-            return this.currentProduct;
+        if (day >= this.currentProduct.releaseDay && day < this.currentProduct.releaseDay + 1) {
+            return true;
         }
     }
     sellSoftware (amount) {
@@ -100,7 +130,8 @@ class Office extends Building {
 
 class Farm extends Building {
     plantingDay: number;
-    constructor (public name: string, public owner: Citizen, public dims: Blueprint, public pay: number, protected money: number) {
+    bankruptStart: number;
+    constructor (public name: string, public owner: Citizen, public dims: Blueprint, public pay: number, public money: number) {
         super(name, owner, dims, money);
         this.employed = [];
         this.administrationEff *= (this.employed.length + 1) / this.maxEmployed;
@@ -124,11 +155,13 @@ class Farm extends Building {
         // How many bushels are in 1 square foot
         return 135 / 43560;
     }
-    buyCorn (day: number) {
-        // To plant 1 acre of corn, it costs around $120
-        this.plantingDay = day;
-        const totalCost = (this.area / 43560) * 120;
-        this.money -= totalCost;
+    plantCorn (day: number) {
+        if (!this.plantingDay) {
+            // To plant 1 acre of corn, it costs around $120
+            this.plantingDay = day;
+            const totalCost = (this.area / 43560) * 120;
+            this.money -= totalCost;
+        }
     }
     autoHarvest (day: number) {
         if (day >= this.plantingDay + 80) {
@@ -139,6 +172,37 @@ class Farm extends Building {
         // Price of 1 dollar per bushel
         this.money += 3.46 * this.bushelPerSqFt * this.area * this.administrationEff;
         this.money = Number(this.money.toFixed(4));
+        this.plantingDay = undefined;
+    }
+
+    payCitizens () {
+        for (const employee of this.employed) {
+            employee.pay(this.pay);
+            this.money -= this.pay;
+        }
+    }
+
+    fireEmployee(employee: Citizen) {
+        this.employed.splice(this.employed.indexOf(employee), 1);
+        employee.occupation = undefined;
+    }
+
+    checkBankruptcy(day: number) {
+        if (this.money < 0) {
+            this.bankruptStart = day;
+        }
+        if (day > this.bankruptStart + 365) {
+            for (const employee of this.employed) {
+                this.fireEmployee(employee);
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    changePay() {
+        this.pay = this.employed.length / this.maxEmployed < 0.8 ? Math.floor(this.pay * 0.99) : Math.ceil(this.pay * 1.01);
     }
 }
 
