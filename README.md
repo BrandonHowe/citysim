@@ -3,23 +3,15 @@
 Hi, and welcome to CitySim! This README should hopefully give you all the information you need about this project.  
 ## About this project  
 This project was partially a school project, partially something to do for fun. It revolves around designing a sustainable city.  
-You'll be able to do things like build roads, place buildings, edit their properties, and so forth. There will be many different types of buildings, such as Apartments, Offices, Hospitals, and more. You'll also have to manage the city's transportation systems in the form of pedestrians, taxicabs, and buses.  
-Naturally, you can't make an all-inclusive city - you have to specialize! If you're making a more industrialized city, that's great, but you probably won't have room for farms. Don't worry, you'll be able to tax your people and businesses in order to buy food. If you are making a farming oriented economy, you'll be more self sufficient, but your industrialization will reflect that. It's up to you!  
+You'll be able to build and close buildings in order to lead your citizens to greatness. You can't choose what they do, but you can guide them on the path to success.
+You can choose to make a city whose wealth lets people take baths in money and use coins as fridge magnets, but you probably won't grow your own food or use sustainable energy sources. Even if you choose to make less money, your sustainability score can go up in the long run if you decide to grow your own food and use renewable energy sources.
 ## Building list  
 |Building name|Status|Benefits|  
 |--|--|--|  
 |Apartment|Partially implemented|Provides housing|  
-|Office|Partially implemented|Your basic capitalist production center|  
-|Shop|Not implemented|Your citizens need items!|  
-|Power plant|Not implemented|Gives your city energy. Will be discussed more later|  
-|Administrative building|Not implemented|Helps govern and manage the city|  
-|Farm|Not implemented|Produces food|  
-|Park|Not implemented|Increases air quality and gives your citizens entertainment  
-|Cinema|Not implemented|Gives your citizens entertainment|  
+|Office|Implemented|Your basic capitalist production center|  
+|Power plant|Partially implemented|Gives your city energy. Will be discussed more later|    
+|Farm|Partially imlemented|Produces food|  
   
 As you can see, there is a myriad of different buildings. You'll need a balance of them to succeed!  
-[add more here]  
-## Citizens  
-Citizens represent your population units. These citizens have requirements, and also some variable numbers. They require a home, food, and entertainment. Naturally, these all can be paid for via money, which they get from a job. Food is the most important. If a citizen goes without food for too long, they will die. Death is the only way a citizen can be removed. If a citizen is unable to pay for his home, then they will become homeless. Homelessness means that a citizen has a higher chance of injury, and an extraordinarily higher chance of becoming a victim of crime. Entertainment is more variable, as different activities can all provide varying levels of entertainment. If a citizen becomes too unhappy, they may become stressed or even depressed, which is bad for a citizen.
-
-TODO: Add strata (rich, middle, lower)
+[add more here] 

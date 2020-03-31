@@ -13,19 +13,19 @@ class PowerPlant {
 
 class SolarPanel extends PowerPlant {
     constructor (public name: string, dims: Blueprint) {
-        super(name, "Solar Panel", dims, 0.05);
+        super(name, "Solar Panel", dims, 0.2);
     }
 }
 
 class WindTurbine extends PowerPlant {
     constructor (public name: string, dims: Blueprint) {
-        super(name, "Wind Farm", dims, 0.1);
+        super(name, "Wind Farm", dims, 0.4);
     }
 }
 
 class CoalFarm extends PowerPlant {
     constructor (public name: string, dims: Blueprint) {
-        super(name, "Coal Plant", dims, 0.5);
+        super(name, "Coal Plant", dims, 3);
     }
 }
 
