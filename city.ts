@@ -2,17 +2,36 @@ import * as faker from 'faker';
 import {Blueprint, Building, Farm, Office, SoftwareProduct} from "./buildings";
 import {Citizen, skills} from "./citizens";
 import {getRandomFromArr, weightedRandom} from "./helpers";
+import {PowerPlant} from "./powerplants";
 
 class City {
     day = 0;
-    buildings: Record<string, Array<Building>> = {
+    buildings: Record<string, Array<Building|PowerPlant>> = {
         farms: <Farm[]>[],
-        offices: <Office[]>[]
+        offices: <Office[]>[],
+        power: <PowerPlant[]>[]
     };
     citizens: Array<Citizen> = [];
     software: Array<SoftwareProduct> = [];
 
-    constructor() {
+    constructor() {}
+
+    get powerNeeded(): number {
+        let totalBuildings = 0;
+        for (const i in this.buildings) {
+            if (i !== "power") {
+                totalBuildings += this.buildings[i].length;
+            }
+        }
+        return totalBuildings * 20000;
+    }
+
+    get powerGenerationInCity(): number {
+        let total = 0;
+        for (const plant of <PowerPlant[]>this.buildings.power) {
+            total += plant.prodPerDay;
+        }
+        return total;
     }
 
     get unemploymentInCity(): number {
@@ -54,12 +73,14 @@ class City {
                 if (this.buildings.farms.length < this.citizens.length / 23) {
                     // Build a farm if there isn't enough food
                     this.buildings.farms.push(citizen.foundFarm());
+                } else if (this.powerNeeded > this.powerGenerationInCity) {
+                    this.buildings.power.push(citizen.foundPowerPlant());
                 } else if (this.unemploymentInCity / this.citizens.length > 0.2) {
                     // Build an office if the unemployment is too high
                     this.buildings.offices.push(citizen.foundOffice(this.day));
                 }
             }
-            for (const citizen of this.citizens.filter(l => l.skill !== "administration" && l.occupation === null)) {
+            for (const citizen of this.citizens.filter(l => l.skill !== "administration" && !l.occupation)) {
                 if (citizen.skill === "farming") {
                     if (this.buildings.farms.length > 0) {
                         const highestPayingFarm: Farm = <Farm>this.buildings.farms.reduce((arr: Farm, acc: Farm) => arr.pay > acc.pay || acc.employed.length >= acc.maxEmployed ? arr : acc);
@@ -113,5 +134,7 @@ let myCity = new City();
 myCity.newRandomCitizen(1000);
 myCity.runDay(2000);
 console.log(myCity.buildings.offices);
-console.log(myCity.citizens.filter(l => l.skill === "administration").length);
+console.log(`${myCity.citizens.filter(l => l.skill === "accounting" && !l.occupation).length}|${myCity.citizens.filter(l => l.skill === "software" && !l.occupation).length}|${myCity.citizens.filter(l => l.skill === "farming" && !l.occupation).length}|${myCity.citizens.filter(l => l.skill === "maintenance" && !l.occupation).length}`);
+console.log(myCity.buildings.power);
+console.log(`${myCity.powerNeeded}|${myCity.powerGenerationInCity}`);
 console.log(myCity.unemploymentInCity);

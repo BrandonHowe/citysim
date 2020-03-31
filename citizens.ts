@@ -1,11 +1,12 @@
 import {Apartment, Blueprint, Building, Farm, Office} from "./buildings";
+import {CoalFarm, PowerPlant, SolarPanel, WindTurbine} from "./powerplants";
 
 const skills: Record<Skill, number> = {
     "software": 7,
     "accounting": 10,
     "farming": 4,
     "maintenance": 10,
-    "administration": 5,
+    "administration": 4,
 };
 
 type Skill = "software" | "accounting" | "farming" | "maintenance" | "administration";
@@ -13,7 +14,7 @@ type Skill = "software" | "accounting" | "farming" | "maintenance" | "administra
 class Citizen {
     food: number;
     happiness: number;
-    occupation: Office | Farm;
+    occupation: Office | Farm | PowerPlant;
     residence: Apartment;
 
     constructor(public name: string, private money: number, public skill: Skill) {
@@ -62,6 +63,25 @@ class Citizen {
         const newFarm = new Farm(`${this.name.split(" ")[1]} Farms`, this, farmBluePrint, Math.floor(Math.random() * 40) + 80, 1000);
         this.occupation = newFarm;
         return newFarm;
+    }
+
+    foundPowerPlant (type: string = "coal") {
+        if (type === "coal") {
+            const coalBluePrint = new Blueprint({x: 1220, y: 50, z: 660}, 1);
+            const newPlant = new CoalFarm(`${this.name.split(" ")[1]} Coalworks`, coalBluePrint);
+            this.occupation = newPlant;
+            return newPlant;
+        } else if (type === "solar") {
+            const solarBluePrint = new Blueprint({x: 660, y: 10, z: 66}, 1);
+            const newPlant = new SolarPanel(`${this.name.split(" ")[1]} Solar`, solarBluePrint);
+            this.occupation = newPlant;
+            return newPlant;
+        } else if (type === "wind") {
+            const windBluePrint = new Blueprint({x: 660, y: 10, z: 66}, 1);
+            const newPlant = new WindTurbine(`${this.name.split(" ")[1]} Solar`, windBluePrint);
+            this.occupation = newPlant;
+            return newPlant;
+        }
     }
 
     switchJobs (offices: Office[]) {

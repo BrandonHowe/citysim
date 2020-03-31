@@ -137,6 +137,7 @@ class Office extends Building {
 class Farm extends Building {
     plantingDay: number;
     bankruptStart: number;
+    powerNeeded: number;
     constructor (public name: string, public owner: Citizen, public dims: Blueprint, public pay: number, public money: number) {
         super(name, owner, dims, money);
         this.employed = [];
