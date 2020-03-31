@@ -67,7 +67,7 @@ class Apartment extends Building {
 class Office extends Building {
     // the pinnacle of capitalism
     maxEmployed: number;
-    private bankruptStart: number;
+    bankruptStart: number;
     currentProduct: SoftwareProduct;
     constructor (public name: string, public owner: Citizen, public dims: Blueprint, public industry: string, public pay: number, public money: number, public foundingDay: number) {
         super(name, owner, dims, money);
@@ -76,6 +76,9 @@ class Office extends Building {
     }
     hire (citizen: Citizen) {
         this.employed.push(citizen);
+        if (this.currentProduct) {
+            this.currentProduct.quality++;
+        }
         citizen.occupation = this;
     }
     payCitizens () {
@@ -87,12 +90,15 @@ class Office extends Building {
 
     fireEmployee(employee: Citizen) {
         this.employed.splice(this.employed.indexOf(employee), 1);
-        employee.occupation = undefined;
+        employee.occupation = null;
     }
 
     checkBankruptcy(day: number) {
-        if (this.money < 0) {
+        if (this.money < 0 && !this.bankruptStart) {
             this.bankruptStart = day;
+        }
+        if (this.money > 0) {
+            this.bankruptStart = undefined;
         }
         if (day > this.bankruptStart + 365) {
             for (const employee of this.employed) {
@@ -105,13 +111,13 @@ class Office extends Building {
     }
 
     changePay() {
-        // this.pay = this.employed.length / this.maxEmployed > 0.2 ? Math.floor(this.pay * 0.99) : Math.ceil(this.pay * 1.01);
+        this.pay = this.employed.length / this.maxEmployed > 0.8 ? Math.floor(this.pay * 0.99) : Math.ceil(this.pay * 1.01);
     }
 
     developProduct (day) {
         if (!this.currentProduct) {
             this.currentProduct = {
-                name: `${this.name.split(" ")[1]} Software`,
+                name: `${this.owner.name.split(" ")[1]} Software`,
                 quality: 1 + (this.employed.length / (Math.floor(Math.random()) + 2)),
                 releaseDay: day + ((2 - (this.employed.length / this.maxEmployed)) * 90),
                 company: this
@@ -184,7 +190,7 @@ class Farm extends Building {
 
     fireEmployee(employee: Citizen) {
         this.employed.splice(this.employed.indexOf(employee), 1);
-        employee.occupation = undefined;
+        employee.occupation = null;
     }
 
     checkBankruptcy(day: number) {
