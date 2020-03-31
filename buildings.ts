@@ -1,5 +1,12 @@
 import {Citizen} from "./citizens";
 
+interface SoftwareProduct {
+    name: string,
+    quality: number,
+    releaseDay: number,
+    company: Office
+}
+
 class Blueprint {
     // x/z: horizontal y: vertical
     constructor (public dims: Record<string, number>, public stories: number){}
@@ -60,36 +67,56 @@ class Apartment extends Building {
 class Office extends Building {
     // the pinnacle of capitalism
     maxEmployed: number;
-    constructor (public name: string, public owner: Citizen, public dims: Blueprint, public industry: string, public salary: number, protected money: number) {
+    private currentProduct: SoftwareProduct;
+    constructor (public name: string, public owner: Citizen, public dims: Blueprint, public industry: string, public pay: number, protected money: number) {
         super(name, owner, dims, money);
         this.maxEmployed = this.dims.maxPplTotal;
-    }
-    get employedCount () {
-        return this.employed.length;
+        this.employed = [];
     }
     hire (citizen: Citizen) {
         this.employed.push(citizen);
+        citizen.occupation = this;
+    }
+    developProduct (day) {
+        if (!this.currentProduct) {
+            this.currentProduct = {
+                name: `${this.name.split(" ")[1]} Software`,
+                quality: 1 + (this.employed.length / (Math.floor(Math.random()) + 2)),
+                releaseDay: day + ((2 - (this.employed.length / this.maxEmployed)) * 180),
+                company: this
+            }
+        }
+    }
+    releaseProduct (day) {
+        if (day >= this.currentProduct.releaseDay) {
+            this.currentProduct = undefined;
+            return this.currentProduct;
+        }
+    }
+    sellSoftware (amount) {
+        this.money += amount;
     }
 }
 
 class Farm extends Building {
     plantingDay: number;
-    constructor (public name: string, public owner: Citizen, public dims: Blueprint, protected money: number) {
+    constructor (public name: string, public owner: Citizen, public dims: Blueprint, public pay: number, protected money: number) {
         super(name, owner, dims, money);
         this.employed = [];
-        this.administrationEff *= (this.employed.length + 1) / this.peopleNeeded;
+        this.administrationEff *= (this.employed.length + 1) / this.maxEmployed;
     }
-    employCitizen (citizen: Citizen) {
+    hire (citizen: Citizen) {
         if (citizen.skill === "farming") {
             this.employed.push(citizen);
-            this.administrationEff = (this.owner.skill === "administration" ? 1 : 0.75) * (this.employed.length + 1) / this.peopleNeeded;
+            citizen.occupation = this;
+            this.administrationEff = (this.owner.skill === "administration" ? 1 : 0.75) * (this.employed.length + 1) / this.maxEmployed;
         }
     }
     get area () {
         // How many square feet does this town take up
         return this.dims.sizePerFloor;
     }
-    get peopleNeeded () {
+    get maxEmployed () {
         // 4 people per acre
         return (4 * this.area / 43560) + 1;
     }
@@ -116,6 +143,7 @@ class Farm extends Building {
 }
 
 export {
+    SoftwareProduct,
     Blueprint,
     Building,
     Apartment,
