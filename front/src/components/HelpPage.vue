@@ -69,7 +69,7 @@
         <h2>Thanks for playing!</h2>
     </div>
 </template>
-
+con
 <script lang="ts">
     import {Component, Prop, Vue} from 'vue-property-decorator';
 

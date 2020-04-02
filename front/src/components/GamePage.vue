@@ -59,7 +59,6 @@
         currentSpeed = 2;
         mounted () {
             this.$store.commit("createPeople");
-            console.log(this.$store.getters.city.buildings.offices);
             this.runDay();
         }
         runDay() {

@@ -18,9 +18,6 @@
         @Prop()
         data: Record<string, any>;
         destroyOffice(office: Record<string, any>) {
-            console.log("destroy");
-            console.log(this.$store.getters.city.citizens);
-            console.log(this.$store.getters.city.unemploymentInCity);
             this.$store.getters.city.software.splice(this.$store.getters.city.software.findIndex(l => l.company === office), 1);
             this.$store.getters.city.buildings.offices.splice(this.$store.getters.city.buildings.offices.indexOf(office), 1);
             office.destroyCompany();

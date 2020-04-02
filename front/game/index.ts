@@ -15,4 +15,3 @@ const myCitizen = new Citizen ("Joe", 100, "administration");
 const myFarm = new Farm("Farm", myCitizen, myFarmBlueprint, 100, 100);
 myFarm.plantCorn(0);
 myFarm.autoHarvest(80);
-console.log(myFarm);
