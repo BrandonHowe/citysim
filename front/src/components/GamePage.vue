@@ -10,6 +10,8 @@
             v-if="selected === 'City'"
             :data="$store.getters.city"
             class="cityInfo"
+            @changeSpeed="changeSpeed"
+            :speed="currentSpeed"
         ></CityInfo>
         <OfficeBox
             class="officeBox"
@@ -31,6 +33,10 @@
             :apartments="$store.getters.city.buildings.apartments"
             class="apartments"
         ></ApartmentBox>
+        <HelpPage
+            v-if="selected === 'Help'"
+            class="help"
+        ></HelpPage>
     </div>
 </template>
 
@@ -43,21 +49,28 @@
     import PowerBox from "@/components/PowerBox.vue";
     import ApartmentBox from "@/components/ApartmentBox.vue";
     import CityInfo from "@/components/CityInfo.vue";
+    import HelpPage from "@/components/HelpPage.vue";
     @Component({
-        components: {CityInfo, ApartmentBox, PowerBox, FarmBox, OfficeBox, Sidebar}
+        components: {HelpPage, CityInfo, ApartmentBox, PowerBox, FarmBox, OfficeBox, Sidebar}
     })
     export default class GamePage extends Vue {
         selected = "City";
+        speeds = [5000, 1000, 500, 100];
+        currentSpeed = 2;
         mounted () {
             this.$store.commit("createPeople");
             console.log(this.$store.getters.city.buildings.offices);
-            const self = this;
-            setInterval(() => {
-                self.$store.commit("runDay");
-            }, 100)
+            this.runDay();
+        }
+        runDay() {
+            this.$store.commit("runDay");
+            setTimeout(this.runDay, this.speeds[this.currentSpeed]);
         }
         changeSidebar (value) {
             this.selected = value;
+        }
+        changeSpeed (value) {
+            this.currentSpeed = value;
         }
     }
 </script>
@@ -94,5 +107,10 @@
     .cityInfo {
         grid-column: 4 / 21;
         grid-row: 1 / 21;
+    }
+    .help {
+        grid-column: 4 / 21;
+        grid-row: 1 / 21;
+        text-align: left;
     }
 </style>

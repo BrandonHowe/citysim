@@ -23,6 +23,7 @@ class City {
     };
     citizens: Array<Citizen> = [];
     software: Array<SoftwareProduct> = [];
+    administratorsEnabled = true;
 
     constructor() {
     }
@@ -135,6 +136,9 @@ class City {
     runDay(amount: number = 1) {
         for (let i = 0; i < amount; i++) {
             for (const citizen of this.citizens.filter(l => l.skill === "administration")) {
+                if (!this.administratorsEnabled) {
+                    break;
+                }
                 // The first step is to found any new buildings/companies
                 if (citizen.occupation) {
                     continue;
