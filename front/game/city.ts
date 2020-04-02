@@ -1,28 +1,42 @@
+/* eslint-disable */
+
 import * as faker from 'faker';
-import {Blueprint, Building, Farm, Office, SoftwareProduct} from "./buildings";
+import {Apartment, Blueprint, Building, Farm, Office, SoftwareProduct} from "./buildings";
 import {Citizen, skills} from "./citizens";
 import {getRandomFromArr, weightedRandom} from "./helpers";
 import {PowerPlant} from "./powerplants";
 
+interface Buildings {
+    farms: Farm[];
+    offices: Office[];
+    power: PowerPlant[];
+    apartments: Apartment[];
+}
+
 class City {
     day = 0;
-    buildings: Record<string, Array<Building|PowerPlant>> = {
+    buildings: Buildings = {
         farms: <Farm[]>[],
         offices: <Office[]>[],
-        power: <PowerPlant[]>[]
+        power: <PowerPlant[]>[],
+        apartments: <Apartment[]>[]
     };
     citizens: Array<Citizen> = [];
     software: Array<SoftwareProduct> = [];
 
-    constructor() {}
+    constructor() {
+    }
+
+    get totalHousing(): number {
+        let totalHousing = 0;
+        for (const apartment of this.buildings.apartments) {
+            totalHousing += apartment.totalApartments;
+        }
+        return totalHousing;
+    }
 
     get powerNeeded(): number {
-        let totalBuildings = 0;
-        for (const i in this.buildings) {
-            if (i !== "power") {
-                totalBuildings += this.buildings[i].length;
-            }
-        }
+        let totalBuildings = this.buildings.offices.length + this.buildings.farms.length;
         return totalBuildings * 20000;
     }
 
@@ -46,33 +60,68 @@ class City {
         for (let i = 0; i < amount; i++) {
             this.citizens.push(new Citizen(faker.name.findName(), 100, weightedRandom(skills)));
         }
-        console.log(this.citizens.filter(l => l.skill === "administration").length);
     }
 
-    sellAllSoftware () {
+    sellAllSoftware() {
         for (const software of this.software) {
             if (this.day < software.releaseDay + 180) {
                 const sellCopies = Math.floor(Math.random() * 100) + 100;
-                console.log(`sold ${sellCopies} copies! ${software.company.money}`);
                 software.company.sellSoftware(software.quality * sellCopies);
             } else {
+                software.company.destroyProduct();
                 this.software.splice(this.software.indexOf(software), 1);
             }
         }
     }
 
+    get totalMoney() {
+        let total = 0;
+        for (const office of this.buildings.offices) {
+            total += office.money;
+        }
+        return total;
+    }
+
+    get sustainabilityScore () {
+        let score = 0;
+        const powerGenScore = this.powerGenerationInCity / this.powerNeeded;
+        score += 15 * ((powerGenScore > 1) ? 1 : powerGenScore);
+        const powerTypeScore = this.buildings.power.filter(l => l.type !== "Coal Plant").length / (this.buildings.power.length === 0 ? 1 : this.buildings.power.length);
+        score += 25 * powerTypeScore;
+        const foodGenScore = this.buildings.farms.length / (this.citizens.length / 46);
+        score += 40 * ((foodGenScore > 1) ? 1 : foodGenScore);
+        const housingScore = this.totalHousing / this.citizens.length;
+        score += (housingScore > 1 ? 1 : housingScore) * 20;
+        console.log(powerGenScore + "|" + powerTypeScore + "|" + foodGenScore + "|" + housingScore);
+        return score;
+    }
+
+    checkImmigration() {
+        if (this.totalMoney > 0) {
+            this.newRandomCitizen(Math.floor(Math.random() * 20));
+        }
+    }
+
     runDay(amount: number = 1) {
         for (let i = 0; i < amount; i++) {
-            // console.log(`Day ${this.day}: ${this.buildings.offices.length} offices`);
-            console.log(Array.from(<Office[]>myCity.buildings.offices, l => l.money));
             for (const citizen of this.citizens.filter(l => l.skill === "administration")) {
                 // The first step is to found any new buildings/companies
                 if (citizen.occupation) {
                     continue;
                 }
-                if (this.buildings.farms.length < this.citizens.length / 23) {
-                    // Build a farm if there isn't enough food
-                    this.buildings.farms.push(citizen.foundFarm());
+                if (this.totalHousing < this.citizens.length) {
+                    if (this.citizens.length > 1000) {
+                        getRandomFromArr(this.buildings.apartments).upgradeApartment();
+                    } else {
+                        this.buildings.apartments.push(citizen.foundApartment());
+                    }
+                } else if (this.buildings.farms.length < this.citizens.length / 23) {
+                    // Build a farm if there isn't enough food and we don't have over 60 farms
+                    if (this.buildings.farms.length < 60) {
+                        this.buildings.farms.push(citizen.foundFarm());
+                    } else {
+                        getRandomFromArr(this.buildings.farms).upgradeFarm();
+                    }
                 } else if (this.powerNeeded > this.powerGenerationInCity) {
                     this.buildings.power.push(citizen.foundPowerPlant());
                 } else if (this.unemploymentInCity / this.citizens.length > 0.2) {
@@ -81,6 +130,7 @@ class City {
                 }
             }
             for (const citizen of this.citizens.filter(l => l.skill !== "administration" && !l.occupation)) {
+                // If they don't have a job, get one
                 if (citizen.skill === "farming") {
                     if (this.buildings.farms.length > 0) {
                         const highestPayingFarm: Farm = <Farm>this.buildings.farms.reduce((arr: Farm, acc: Farm) => arr.pay > acc.pay || acc.employed.length >= acc.maxEmployed ? arr : acc);
@@ -99,9 +149,11 @@ class City {
                 }
             }
             for (const citizen of this.citizens.filter(l => l.skill === "software" || l.skill === "accounting")) {
+                // Switch jobs if it's good for them
                 citizen.switchJobs(<Office[]>this.buildings.offices);
             }
             for (const office of <Office[]>this.buildings.offices) {
+                // Daily office management
                 office.payCitizens();
                 office.changePay();
                 const isBankrupt = office.checkBankruptcy(this.day);
@@ -117,24 +169,31 @@ class City {
                 }
             }
             for (const farm of <Farm[]>this.buildings.farms) {
+                // Daily farm management
                 farm.payCitizens();
                 farm.changePay();
                 const isBankrupt = farm.checkBankruptcy(this.day);
-                if (isBankrupt) {
+                if (isBankrupt && isNaN(farm.money)) {
+                    farm.owner.occupation = null;
                     this.buildings.farms.splice(this.buildings.farms.indexOf(farm), 1);
                 }
+                farm.plantCorn(this.day);
+                farm.autoHarvest(this.day);
             }
+            for (const apartment of this.buildings.apartments) {
+                apartment.collectRent();
+                apartment.changeRent();
+            }
+            for (const citizen of this.citizens.filter(l => !l.residence)) {
+                // Move in if they don't have a home
+                const bestRentApartment = this.buildings.apartments.reduce((acc, cur) => acc.rentPrice < cur.rentPrice && !acc.isFull ? acc : cur);
+                citizen.moveIn(bestRentApartment);
+            }
+            this.checkImmigration();
             this.sellAllSoftware();
             this.day++;
         }
     }
 }
 
-let myCity = new City();
-myCity.newRandomCitizen(1000);
-myCity.runDay(2000);
-console.log(myCity.buildings.offices);
-console.log(`${myCity.citizens.filter(l => l.skill === "accounting" && !l.occupation).length}|${myCity.citizens.filter(l => l.skill === "software" && !l.occupation).length}|${myCity.citizens.filter(l => l.skill === "farming" && !l.occupation).length}|${myCity.citizens.filter(l => l.skill === "maintenance" && !l.occupation).length}`);
-console.log(myCity.buildings.power);
-console.log(`${myCity.powerNeeded}|${myCity.powerGenerationInCity}`);
-console.log(myCity.unemploymentInCity);
+export {City}

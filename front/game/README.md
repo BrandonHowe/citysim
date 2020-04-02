@@ -11,7 +11,7 @@ You can choose to make a city whose wealth lets people take baths in money and u
 |Apartment|Partially implemented|Provides housing|  
 |Office|Implemented|Your basic capitalist production center|  
 |Power plant|Partially implemented|Gives your city energy. Will be discussed more later|    
-|Farm|Partially imlemented|Produces food|  
+|Farm|Partially implemented|Produces food|  
   
 As you can see, there is a myriad of different buildings. You'll need a balance of them to succeed!  
 [add more here] 

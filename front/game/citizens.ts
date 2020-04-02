@@ -14,7 +14,7 @@ type Skill = "software" | "accounting" | "farming" | "maintenance" | "administra
 class Citizen {
     food: number;
     happiness: number;
-    occupation: Office | Farm | PowerPlant;
+    occupation: Office | Farm | PowerPlant | Apartment | null;
     residence: Apartment;
 
     constructor(public name: string, private money: number, public skill: Skill) {
@@ -49,6 +49,13 @@ class Citizen {
         this.money += money;
     }
 
+    foundApartment() {
+        const apartmentBlueprint = new Blueprint ({x:200, y:50, z:200}, 5);
+        const newApartment = new Apartment(`${this.name.split(" ")[1]} Apartments`, this, apartmentBlueprint, 500, Number((Math.random() * 3).toFixed(1)), 1000);
+        this.occupation = newApartment;
+        return newApartment;
+    }
+
     foundOffice(day: number) {
         // 2500 sq ft, a small office.
         const officeBlueprint = new Blueprint({x: 20, y: 20, z: 20}, 2);
@@ -60,12 +67,12 @@ class Citizen {
     foundFarm() {
         // 1 acre large
         const farmBluePrint = new Blueprint({x: 660, y: 10, z: 66}, 1);
-        const newFarm = new Farm(`${this.name.split(" ")[1]} Farms`, this, farmBluePrint, Math.floor(Math.random() * 40) + 80, 1000);
+        const newFarm = new Farm(`${this.name.split(" ")[1]} Farms`, this, farmBluePrint, Math.floor(Math.random() * 20) + 40, 1000);
         this.occupation = newFarm;
         return newFarm;
     }
 
-    foundPowerPlant (type: string = "coal") {
+    foundPowerPlant (type: "coal" | "solar" | "wind" = "coal"): PowerPlant {
         if (type === "coal") {
             const coalBluePrint = new Blueprint({x: 1220, y: 50, z: 660}, 1);
             const newPlant = new CoalFarm(`${this.name.split(" ")[1]} Coalworks`, coalBluePrint);
@@ -85,12 +92,25 @@ class Citizen {
     }
 
     switchJobs (offices: Office[]) {
-        if (offices.length > 0 && this.occupation) {
-            const highestPayingWorkspace = <Office>offices.reduce((acc: Office, cur: Office) => acc.pay > cur.pay ? acc : cur);
-            if (highestPayingWorkspace.pay > this.occupation.pay * 1.1) {
-                this.occupation.employed.splice(this.occupation.employed.indexOf(this), 1);
-                this.occupation = null;
-                this.getHired(highestPayingWorkspace);
+        if (this.skill !== "administration") {
+            if (offices.length > 0 && this.occupation) {
+                const highestPayingWorkspace: Office = offices.reduce((acc: Office, cur: Office) => acc.pay > cur.pay ? acc : cur);
+                if (highestPayingWorkspace.pay > this.occupation.pay * 1.1) {
+                    this.occupation.employed.splice(this.occupation.employed.indexOf(this), 1);
+                    this.occupation = null;
+                    this.getHired(highestPayingWorkspace);
+                }
+            }
+        }
+    }
+
+    switchApartments (apartments: Apartment[]) {
+        if (apartments.length > 0 && this.residence) {
+            const bestRentApartment: Apartment = apartments.reduce((acc: Apartment, cur: Apartment) => acc.rentPerSqft < cur.rentPerSqft ? acc : cur);
+            if (bestRentApartment.rentPerSqft < this.residence.rentPerSqft * 0.9) {
+                this.residence.renters.splice(this.residence.renters.indexOf(this), 1);
+                this.residence = null;
+                this.moveIn(bestRentApartment);
             }
         }
     }

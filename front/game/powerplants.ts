@@ -5,7 +5,9 @@ class PowerPlant {
     // Watt production per sqft per hour
     employed: Citizen[] = [];
     pay: number;
-    constructor (public name: string, public type: string, public dims: Blueprint, public production: number) {}
+    constructor (public name: string, public type: string, public dims: Blueprint, public production: number) {
+        this.pay = 100;
+    }
     get prodPerDay () {
         return this.dims.sizePerFloor * this.production * 8;
     }
