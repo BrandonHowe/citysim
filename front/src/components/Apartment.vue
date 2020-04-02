@@ -1,5 +1,5 @@
 <template>
-    <div class="apartment">
+    <div class="apartment" @click="destroyApartment(data)">
         <h4>{{data.name}}</h4>
         <h5>{{data.renters.length}}/{{data.totalApartments}} tenants</h5>
         <h6>Rent: ${{data.rentPrice}}</h6>
@@ -13,7 +13,11 @@
     @Component
     export default class Apartment extends Vue {
         @Prop()
-        data: Record<string, any>
+        data: Record<string, any>;
+        destroyApartment(apartment: Record<string, any>) {
+            this.$store.getters.city.buildings.apartments.splice(this.$store.getters.city.buildings.apartments.indexOf(apartment), 1);
+            apartment.destroyCompany();
+        }
     }
 </script>
 

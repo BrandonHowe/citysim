@@ -92,13 +92,43 @@ class City {
         score += 40 * ((foodGenScore > 1) ? 1 : foodGenScore);
         const housingScore = this.totalHousing / this.citizens.length;
         score += (housingScore > 1 ? 1 : housingScore) * 20;
-        console.log(powerGenScore + "|" + powerTypeScore + "|" + foodGenScore + "|" + housingScore);
         return score;
     }
 
     checkImmigration() {
         if (this.totalMoney > 0) {
             this.newRandomCitizen(Math.floor(Math.random() * 20));
+        }
+    }
+
+    create(arg: string) {
+        const newCitizen = new Citizen (faker.name.findName(), 100, "administration");
+        switch (arg) {
+            case "Apartment":
+                this.buildings.apartments.push(newCitizen.foundApartment());
+                this.citizens.push(newCitizen);
+                return true;
+            case "Office":
+                this.buildings.offices.push(newCitizen.foundOffice(this.day));
+                this.citizens.push(newCitizen);
+                return true;
+            case "Farm":
+                this.buildings.farms.push(newCitizen.foundFarm());
+                this.citizens.push(newCitizen);
+                return true;
+            case "Coal Plant":
+                this.buildings.power.push(newCitizen.foundPowerPlant("coal"));
+                this.citizens.push(newCitizen);
+                return true;
+            case "Wind Farm":
+                this.buildings.power.push(newCitizen.foundPowerPlant("wind"));
+                this.citizens.push(newCitizen);
+                return true;
+            case "Solar Field":
+                this.buildings.power.push(newCitizen.foundPowerPlant("solar"));
+                return true;
+            default:
+                return false;
         }
     }
 

@@ -85,7 +85,7 @@ class Citizen {
             return newPlant;
         } else if (type === "wind") {
             const windBluePrint = new Blueprint({x: 660, y: 10, z: 66}, 1);
-            const newPlant = new WindTurbine(`${this.name.split(" ")[1]} Solar`, windBluePrint);
+            const newPlant = new WindTurbine(`${this.name.split(" ")[1]} Turbines`, windBluePrint);
             this.occupation = newPlant;
             return newPlant;
         }

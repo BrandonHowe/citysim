@@ -10,10 +10,20 @@
             <li>Farmers: {{data.citizens.filter(l => l.skill === "farming").length}}</li>
             <li>Maintenance Workers: {{data.citizens.filter(l => l.skill === "maintenance").length}}</li>
         </ul>
-        <h4>Unemployment: {{Math.floor(data.unemploymentInCity / data.citizens.length)}}%</h4>
-        <h4>Homelessness: {{Math.round(data.citizens.filter(l => !l.residence).length / data.citizens.length)}}%</h4>
+        <h4>Unemployment: {{(100 - (data.unemploymentInCity * 100 / data.citizens.length)).toFixed(1)}}%</h4>
+        <h4>Homelessness: {{(100 * data.citizens.filter(l => !l.residence).length / data.citizens.length).toFixed(1)}}%</h4>
         <h4>Power generation: {{data.powerGenerationInCity}} / {{data.powerNeeded}} / {{Math.floor(data.powerGenerationInCity / data.powerNeeded * 100)}}%</h4>
         <h3>Sustainability score: {{data.sustainabilityScore}}</h3>
+        <br>
+        <h3>Build a new building!</h3>
+        <div
+            v-for="option in createOptions"
+            :key="option"
+            class="create"
+            @click="$store.getters.city.create(option)"
+        >
+            {{option[0].toUpperCase() + option.slice(1)}}
+        </div>
     </div>
 </template>
 
@@ -24,6 +34,14 @@
     export default class CityInfo extends Vue {
         @Prop()
         data: Record<string, any>;
+        createOptions = {
+            "apartment": "Apartments",
+            "office": "Office",
+            "farm": "Farm",
+            "coal": "Coal Plant",
+            "wind": "Wind Farm",
+            "solar": "Solar Field"
+        }
     }
 </script>
 
@@ -32,5 +50,19 @@
     .cityInfo {
         padding-left: 1%;
         text-align: left;
+    }
+    .create {
+        width: 100px;
+        line-height: 100px;
+        height: 100px;
+        text-align: center;
+        background-color: #ddd;
+        display: inline-block;
+        margin: 10px;
+        user-select: none;
+        transition: background-color 0.3s;
+    }
+    .create:hover {
+        background-color: #ccc;
     }
 </style>

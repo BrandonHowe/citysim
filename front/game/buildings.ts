@@ -89,6 +89,13 @@ class Apartment extends Building {
         this.apartmentsPerFloor = this.dims.sizePerFloor / this.apartmentSize / 2;
         this.totalApartments = this.dims.stories * this.apartmentsPerFloor;
     }
+
+    destroyCompany () {
+        for (const tenant of this.renters) {
+            this.evict(tenant);
+        }
+        return true;
+    }
 }
 
 class Office extends Building {
@@ -121,6 +128,14 @@ class Office extends Building {
     fireEmployee(employee: Citizen) {
         this.employed.splice(this.employed.indexOf(employee), 1);
         employee.occupation = null;
+    }
+
+    destroyCompany () {
+        for (const employee of this.employed) {
+            this.fireEmployee(employee);
+        }
+        this.destroyProduct();
+        return true;
     }
 
     checkBankruptcy(day: number) {
@@ -260,6 +275,13 @@ class Farm extends Building {
             this.dims.dims.x *= 2;
             this.dims.dims.z *= 2;
         }
+    }
+
+    destroyCompany () {
+        for (const employee of this.employed) {
+            this.fireEmployee(employee);
+        }
+        return true;
     }
 }
 

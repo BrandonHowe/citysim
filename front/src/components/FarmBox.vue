@@ -16,7 +16,7 @@
     })
     export default class FarmBox extends Vue {
         @Prop()
-        farms: Array<Record<string, any>>
+        farms: Array<Record<string, any>>;
     }
 </script>
 

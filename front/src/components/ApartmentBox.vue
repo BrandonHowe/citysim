@@ -16,7 +16,7 @@
     })
     export default class ApartmentBox extends Vue {
         @Prop()
-        apartments: Array<Record<string, any>>
+        apartments: Array<Record<string, any>>;
     }
 </script>
 

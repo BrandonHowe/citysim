@@ -17,7 +17,7 @@
     })
     export default class OfficeBox extends Vue {
         @Prop()
-        offices: Array<Record<string, any>>
+        offices: Array<Record<string, any>>;
     }
 </script>
 

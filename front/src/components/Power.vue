@@ -1,5 +1,5 @@
 <template>
-    <div class="power">
+    <div class="power" @click="destroyPower(data)">
         <h4>{{data.name}}</h4>
         <h5>Type: {{data.type}}</h5>
         <h5>Size: {{data.dims.sizePerFloor}}</h5>
@@ -14,6 +14,10 @@
     export default class Power extends Vue {
         @Prop()
         data: Record<string, any>;
+        destroyPower(power: Record<string, any>) {
+            this.$store.getters.city.buildings.power.splice(this.$store.getters.city.buildings.power.indexOf(power), 1);
+            power.destroyCompany();
+        }
     }
 </script>
 

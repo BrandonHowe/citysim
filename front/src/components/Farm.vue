@@ -1,5 +1,5 @@
 <template>
-    <div class="farm">
+    <div class="farm" @click="destroyFarm(data)">
         <h4>{{data.name}}</h4>
         <h5>${{Number(data.money.toFixed(5))}}</h5>
         <h6>{{data.employed.length}} employees</h6>
@@ -17,6 +17,10 @@
     export default class Farm extends Vue {
         @Prop()
         data: Record<string, any>;
+        destroyFarm(farm: Record<string, any>) {
+            this.$store.getters.city.buildings.farms.splice(this.$store.getters.city.buildings.farms.indexOf(farm), 1);
+            farm.destroyCompany();
+        }
     }
 </script>
 

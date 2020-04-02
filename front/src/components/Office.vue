@@ -1,5 +1,5 @@
 <template>
-    <div class="office">
+    <div class="office" @click="destroyOffice(data)">
         <h4>{{data.name}}</h4>
         <h5>${{Number(data.money.toFixed(5))}}</h5>
         <h6>{{data.employed.length}} employees</h6>
@@ -17,6 +17,14 @@
     export default class Office extends Vue {
         @Prop()
         data: Record<string, any>;
+        destroyOffice(office: Record<string, any>) {
+            console.log("destroy");
+            console.log(this.$store.getters.city.citizens);
+            console.log(this.$store.getters.city.unemploymentInCity);
+            this.$store.getters.city.software.splice(this.$store.getters.city.software.findIndex(l => l.company === office), 1);
+            this.$store.getters.city.buildings.offices.splice(this.$store.getters.city.buildings.offices.indexOf(office), 1);
+            office.destroyCompany();
+        }
     }
 </script>
 

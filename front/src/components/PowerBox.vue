@@ -17,7 +17,7 @@
     })
     export default class PowerBox extends Vue {
         @Prop()
-        powerPlants: Array<Record<string, any>>
+        powerPlants: Array<Record<string, any>>;
     }
 </script>
 
